@@ -16,11 +16,11 @@ YOU MUST GIVE IT A TRY
 
 SAMPLE PHOTOS:
 
-![Main View](images/1.jpeg)
-![Create Folder](images/2.jpeg)
-![Folder View](images/3.jpeg)
-![Insert Image](images/4.jpeg)
-![Show Image](images/5.jpeg)
-
-
+<p float="left">
+<img src="images/1.jpeg" width="300">
+<img src="images/2.jpeg" width="300">
+<img src="images/3.jpeg" width="300">
+<img src="images/4.jpeg" width="300">
+<img src="images/5.jpeg" width="300">
+</p>
 ###### YOU CAN ALSO LEAVES YOUR SUGGESTION
