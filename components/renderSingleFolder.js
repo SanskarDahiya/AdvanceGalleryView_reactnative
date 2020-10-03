@@ -17,82 +17,8 @@ import DialogInput from 'react-native-dialog-input';
 import {Actions} from 'react-native-router-flux';
 let {width, height} = Dimensions.get('window');
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.springValue = new Animated.Value(100);
-
-    this.state = {
-      openDialog: false,
-      openDialog_delete: false,
-      folderData: [],
-      folderNames: [],
-      inputBoxData: {
-        title: 'CREATE FOLDER',
-        message: '',
-        hintInput: 'Enter Name',
-      },
-    };
-  }
-  handleBackButton = () => {
-    this.state.backClickCount == 1 ? BackHandler.exitApp() : this._spring();
-
-    return true;
-  };
-  componentWillUnmount() {
-    BackHandler.removeEventListener(
-      'hardwareBackPress',
-      this.handleBackButton.bind(this),
-    );
-  }
-  componentDidMount() {
-    this.updateState();
-    // BackHandler.addEventListener(
-    //   'hardwareBackPress',
-    //   this.handleBackButton.bind(this),
-    // );
-  }
-
-  _spring() {
-    console.log('spring');
-    this.setState({backClickCount: 1}, () => {
-      Animated.sequence([
-        Animated.spring(this.springValue, {
-          toValue: -0.15 * height,
-          friction: 5,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(this.springValue, {
-          toValue: 100,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        this.setState({backClickCount: 0});
-      });
-    });
-  }
-
-  updateState = async () => {
-    try {
-      let folderData = {};
-      const folderNames = await storage.AllItems();
-      for (let folder of folderNames) {
-        let data = await storage.getData(folder);
-        data = JSON.parse(data);
-        folderData[folder] = data;
-      }
-      this.setState({folderData, folderNames});
-    } catch (err) {
-      Alert.alert(
-        'Please, restart the app',
-        '',
-        [{text: 'OK', onPress: () => console.log('OK Pressed')}],
-        {cancelable: false},
-      );
-    }
-  };
+class SingleFolder extends Component {
+  constructor(props) {}
   // openDialog_delete
   render() {
     const {
@@ -291,4 +217,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default SingleFolder;

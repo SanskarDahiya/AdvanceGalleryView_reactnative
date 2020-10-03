@@ -1,7 +1,17 @@
 import React, {Component} from 'react';
 import ImagePicker from 'react-native-image-picker';
-import {Button, Image, StyleSheet, Text, View, ScrollView} from 'react-native';
+import {
+  Button,
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Pressable,
+  Alert,
+} from 'react-native';
 import storage from './localStorage';
+import ImageViewerComponents from './renderImage';
+import {Actions} from 'react-native-router-flux';
 // More info on all the options is below in the API Reference... just some common use cases shown here
 const options = {
   title: 'Select Image To Upload',
@@ -10,35 +20,11 @@ const options = {
     path: 'images',
   },
 };
-var RNFS = require('react-native-fs');
 
 /**
  * The first arg is the options object for customization (it can also be null or omitted for default options),
  * The second arg is the callback which sends object: response (more info in the API Reference)
  */
-
-let sampleData = [
-  {
-    name: 'a1',
-    image: 'https://homepages.cae.wisc.edu/~ece533/images/airplane.png',
-  },
-  {
-    name: 'a2',
-    image: 'https://homepages.cae.wisc.edu/~ece533/images/airplane.png',
-  },
-  {
-    name: 'a3',
-    image: 'https://homepages.cae.wisc.edu/~ece533/images/airplane.png',
-  },
-  {
-    name: 'a4',
-    image: 'https://homepages.cae.wisc.edu/~ece533/images/airplane.png',
-  },
-  {
-    name: 'ring',
-    image: 'https://homepages.cae.wisc.edu/~ece533/images/airplane.png',
-  },
-];
 
 class App extends Component {
   constructor(props) {
@@ -57,7 +43,7 @@ class App extends Component {
     });
   }
   chooseImage = () => {
-    ImagePicker.showImagePicker(options, response => {
+    ImagePicker.launchImageLibrary(options, response => {
       console.log('Response = ', Object.keys(response));
       if (response.didCancel) {
         console.log('User cancelled image picker');
@@ -81,7 +67,7 @@ class App extends Component {
         ];
         this.setState({folderData});
         storage.setData(folderName, JSON.stringify(folderData)).then(res => {
-          this.props.update && this.props.update();
+          // this.props.update && this.props.update();
         });
         // this.setState({data: response});
         // You can also display the image using data:
@@ -104,23 +90,68 @@ class App extends Component {
                 flexWrap: 'wrap',
                 flexDirection: 'row',
                 width: '100%',
-                borderWidth: 2,
-                borderColor: 'pink',
               },
             ]}>
-            {[...sampleData, ...folderData].map(item => {
+            {folderData.map((item, index) => {
               const {name} = item;
               return (
                 // each image wrapper
                 <View
+                  key={index}
                   style={{
                     flexGrow: 1, // to fill last part, if require
                     width: '50%',
                     position: 'relative',
-                    paddingHorizontal: 10,
-                    paddingVertical: 10,
                   }}>
-                  <ImageViewer imageData={item} />
+                  <Pressable
+                    onPress={() => {
+                      Actions.singleImage({
+                        imageData: item,
+                        isSingle: true,
+                        style: {
+                          height: 'auto',
+                          width: 'auto',
+                          position: 'absolute',
+                          top: 0,
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                        },
+                      });
+                    }}
+                    onLongPress={() => {
+                      console.log('long press');
+                      Alert.alert(
+                        '',
+                        'Delete Current Image:',
+                        [
+                          {
+                            text: 'Cancel',
+                            onPress: () => {
+                              console.log('Cancel Pressed');
+                            },
+                            style: 'cancel',
+                          },
+                          {
+                            text: 'OK',
+                            onPress: () => {
+                              let {folderData} = this.state;
+                              console.log(index);
+                              folderData.splice(index, 1);
+                              storage
+                                .setData(folderName, JSON.stringify(folderData))
+                                .then(() => {
+                                  this.setState({folderData: [...folderData]});
+                                });
+                              console.log('OK Pressed');
+                            },
+                          },
+                        ],
+                        {cancelable: false},
+                      );
+                    }}>
+                    <ImageViewerComponents imageData={item} />
+                  </Pressable>
 
                   <View
                     style={{
@@ -143,46 +174,6 @@ class App extends Component {
           title={'insert IMage'}
           style={{backgroundColor: 'white'}}
           onPress={this.chooseImage}
-        />
-      </View>
-    );
-  }
-}
-class ImageViewer extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      ...props.imageData,
-    };
-  }
-  async componentDidMount() {
-    const {name, image, path, type} = this.state || {};
-    if (path) {
-      let data = await RNFS.stat(path);
-      data = await RNFS.readFile(path, 'base64');
-      // console.log(data, '111');
-      console.log(data.slice(0, 50), '111');
-      this.setState({
-        source: {uri: `data:${path || 'image/jpg'};base64,${data}`},
-      });
-    }
-  }
-  render() {
-    let {image, source} = this.state || {};
-    if (!source) {
-      source = {uri: image};
-    }
-    return (
-      <View>
-        <Image
-          source={source}
-          resizeMode="contain"
-          style={[
-            styles.logo,
-            {
-              // here
-            },
-          ]}
         />
       </View>
     );
