@@ -58,13 +58,7 @@ class App extends Component {
   };
   // openDialog_delete
   render() {
-    const {
-      folderData,
-      folderNames,
-      openDialog_delete,
-      openDialog,
-      inputBoxData
-    } = this.state;
+    const { folderData, folderNames, openDialog, inputBoxData } = this.state;
     return (
       <View style={styles.app}>
         <DialogInput
@@ -127,6 +121,7 @@ class App extends Component {
             {folderNames && folderNames.length ? (
               folderNames.map(name => {
                 let image = folderData[name][0];
+                console.log({ image }, "!!!!!!!!!!!!!!!");
                 return (
                   // each image wrapper
                   <Pressable
@@ -176,7 +171,7 @@ class App extends Component {
                     }}
                   >
                     <View>
-                      {image && image.uri ? (
+                      {image && image.image ? (
                         <ImageViewerComponents imageData={image} />
                       ) : (
                         <Image
